@@ -15,6 +15,8 @@ const reactTemplate = path.resolve(__dirname, './test-templates/react-template')
 const nunjucksTemplate = path.resolve(__dirname, './test-templates/nunjucks-template');
 //temp location where react template is copied for each test that does some mutation on template files
 const copyOfReactTemplate = path.resolve(__dirname, './temp/reactTemplate');
+const log = require('loglevel');
+const logMessage = require('./../lib/logMessages.js');
 
 describe('Integration testing generateFromFile() to make sure the result of the generation is not changend comparing to snapshot', () => {
   const generateFolderName = () => {
@@ -125,6 +127,7 @@ describe('Integration testing generateFromFile() to make sure the result of the 
   });
 
   it('should ignore specified files with noOverwriteGlobs', async () => {
+    log.debug = jest.fn();
     const outputDir = generateFolderName();
     const cleanReactTemplate = await getCleanReactTemplate();
     // Manually create a file to test if it's not overwritten
@@ -149,8 +152,6 @@ describe('Integration testing generateFromFile() to make sure the result of the 
     // Check if the files have been overwritten
     expect(fileContent).toBe(testContent);
     // Check if the log debug message was printed
-    /*TODO:
-       Include log message test in the future to ensure that the log.debug for skipping overwrite is called
-     */
+    expect(log.debug).toHaveBeenCalledWith(logMessage.skipOverwrite(testFilePath));
   });
 });
